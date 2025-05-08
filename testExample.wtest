@@ -1,9 +1,143 @@
-import example.pepita
+import habitantes.*
+import trabajadores.*
+import ecoparque.*
 
-describe "group of tests for pepita" {
-
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+// Corrijo el enunciado en el código
+describe "Primera parte" {
+  test "Laura NO puede cuidar al Dragon" {
+    assert.notThat(dragon.puedeSerCuidadoPor(laura))
   }
 
+  // adicional
+  test "Laura puede cuidar de la gárgola" {
+    assert.that(gargola.puedeSerCuidadoPor(laura))
+  }
+
+  test "Rodrigo NO puede cuidar a la gárgola" {
+    assert.notThat(gargola.puedeSerCuidadoPor(rodrigo))
+  }
+
+  // Corrijo
+  test "Rodrigo puede cuidar a la gárgola si cambia de turno y pasa a forma viva" {
+    rodrigo.cambiarDeTurno()
+    gargola.cambiarAformaViva()
+    assert.that(gargola.puedeSerCuidadoPor(rodrigo))
+  }
+
+  test "German puede cuidar al fénix" {
+    assert.that(fenix.puedeSerCuidadoPor(german))
+  }
+
+  test "German TAMBIÉN puede cuidar al dragón" {
+    assert.that(dragon.puedeSerCuidadoPor(german))
+  }
+
+  // adicional
+  test "German NO puede cuidar a la sirena" {
+    assert.notThat(sirena.puedeSerCuidadoPor(german))
+  }
+
+  test "Jimena puede cuidar a la sirena" {
+    assert.that(sirena.puedeSerCuidadoPor(jimena))
+  }
+}
+
+describe "Segunda parte" {
+  test "Se contrata a un trabajador: Rodrigo" {
+    ecoparque.contratarTrabajador(rodrigo)
+    assert.that(ecoparque.trabajadores().contains(rodrigo))
+  }
+
+  test "Se despide a un trabajador: Laura" {
+    ecoparque.despedirTrabajador(laura)
+    assert.notThat(ecoparque.trabajadores().contains(laura))
+  }
+
+  test "Despedir a todos los trabajadores" {
+    ecoparque.despedirTodosLosTrabajadores()
+    assert.that(ecoparque.trabajadores().isEmpty())
+  }
+
+  test "Primero despido a Germán y luego contrato a varios a la vez: Germán y Rodrigo" {
+    ecoparque.despedirTrabajador(german)
+    ecoparque.contratarVariosAlaVez(#{german, rodrigo})
+    assert.that(ecoparque.trabajadores().contains(rodrigo))
+    assert.that(ecoparque.trabajadores().contains(german))
+  }
+
+  test "El equipo de trabajadores primero no es grande y luego contratando a un trabajador sí" {
+    assert.notThat(ecoparque.esGrande())
+    ecoparque.contratarTrabajador(rodrigo)
+    assert.that(ecoparque.esGrande())
+  }
+
+  test "El ecoparque no necesita trabajadores" {
+    assert.notThat(ecoparque.necesitaTrabajadores())
+  }
+
+  test "Se borran a todos los trabajadores y ahora el ecoparque necesita trabajadores" {
+    ecoparque.despedirTodosLosTrabajadores()
+    assert.that(ecoparque.necesitaTrabajadores())
+  }
+}
+
+describe "Tercera parte" {
+  test "Alguno de los trabajadores puede cuidar a la gárgola y al dragón" {
+    assert.that(ecoparque.puedeCuidarA(gargola))
+    assert.that(ecoparque.puedeCuidarA(dragon))
+  }
+
+  test "Se despide a laura y ahora ninguno puede cuidar a la gárgola" {
+    ecoparque.despedirTrabajador(laura)
+    assert.notThat(ecoparque.puedeCuidarA(gargola))
+  }
+
+  test "Se contrata a rodrigo y se obtiene a todos los que pueden cuidar al unicornio: Germán y Rodrigo" {
+    ecoparque.contratarTrabajador(rodrigo)
+    assert.equals(#{german, rodrigo}, ecoparque.trabajadoresQuePuedenCuidarA(unicornio))
+  }
+
+  test "Compruebo que la cantidad de habitantes viejos es 2" {
+    assert.equals(2, ecoparque.cuantosAnimalesViejosHay())
+  }
+
+  test "Se cuidó del unicornio, por lo que su poder mágico ahora es 4 pero no está feliz porque no puede entrenar" {
+    ecoparque.cuidarDe(unicornio)
+    assert.equals(4, unicornio.poderMagico())
+    assert.notThat(unicornio.estaFeliz())
+  }
+
+  test "Se cuida de todos los habitantes. La temperatura del dragón es 180, el poder mágico del unicornio es 4, la habilidad acuática de la sirena es 10, la edad del feniz es 198 y la edad de la gárgola es 14" {
+    ecoparque.cuidarAtodos()
+    assert.equals(180, dragon.temperaturaCorporal())
+    assert.equals(4, unicornio.poderMagico())
+    assert.equals(10, sirena.habilidadAcuatica())
+    assert.equals(198, fenix.edad())
+    assert.equals(14, gargola.edad())
+  }
+
+  test "Pasa un día. El unicornio pasa a estar feliz y la gárgola a forma de estatua. La sirena tiene 40 de poder de habilidad de nuevo." {
+    ecoparque.pasarElDia()
+    assert.that(unicornio.estaFeliz())
+    assert.notThat(gargola.estaEnFormaViva())
+    assert.equals(40, sirena.habilidadAcuatica())
+  }
+
+  test "El habitante más viejo es el fénix" {
+    assert.equals(fenix, ecoparque.habitanteMasViejo())
+  }
+
+  test "La habitante más jóven es la gárgola" {
+    assert.equals(gargola, ecoparque.habitanteMasJoven())
+  }
+
+  test "Se realiza el taller de natación y ahora laura sabe nadar" {
+    ecoparque.realizarTallerDeNatacion()
+    assert.that(laura.sabeNadar())
+  }
+
+  test "Se realiza el taller de resistencia al fuego y ahora jimena resiste altas temperaturas aunque no tenga el traje" {
+    ecoparque.realizarTallerDeResistenciaAlFuego()
+    assert.that(jimena.resisteAltasTemperaturas())
+  }
 }
